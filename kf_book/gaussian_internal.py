@@ -27,7 +27,7 @@ def plot_height_std(x, lw=10):
 
     for i, height in enumerate(x):
         plt.plot([i+1, i+1], [0, height], color='k', lw=lw)
-    plt.xlim(0,len(x)+1)
+    plt.xlim(0, len(x)+1)
     plt.axhline(m-s, ls='--')
     plt.axhline(m+s, ls='--')
     plt.fill_between((0, len(x)+1), m-s, m+s,
@@ -37,16 +37,30 @@ def plot_height_std(x, lw=10):
     plt.show()
 
 
-def plot_correlated_data(X, Y, xlabel=None, 
+def plot_correlated_data(X, Y, xlabel=None,
                          ylabel=None, equal=True):
 
+    """Plot correlation between x and y by performing
+    linear regression between X and Y.
+
+    X: x data
+    Y: y data
+    xlabel: str
+        optional label for x axis
+    ylabel: str
+        optional label for y axis
+    equal: bool, default True
+        use equal scale for x and y axis
+    """
+
+
     plt.scatter(X, Y)
-    
+
     if xlabel is not None:
-        plt.xlabel('Height (in)'); 
-    
+        plt.xlabel(xlabel);
+
     if ylabel is not None:
-        plt.ylabel('Weight (lbs)')
+        plt.ylabel(ylabel)
 
     # fit line through data
     m, b = np.polyfit(X, Y, 1)
@@ -55,11 +69,11 @@ def plot_correlated_data(X, Y, xlabel=None,
         plt.gca().set_aspect('equal')
     plt.show()
 
-def plot_gaussian (mu, variance,
-                   mu_line=False,
-                   xlim=None,
-                   xlabel=None,
-                   ylabel=None):
+def plot_gaussian(mu, variance,
+                  mu_line=False,
+                  xlim=None,
+                  xlabel=None,
+                  ylabel=None):
 
     xs = np.arange(mu-variance*2,mu+variance*2,0.1)
     ys = [stats.gaussian (x, mu, variance)*100 for x in xs]
@@ -73,6 +87,7 @@ def plot_gaussian (mu, variance,
     if ylabel:
        plt.ylabel(ylabel)
     plt.show()
+
 
 def display_stddev_plot():
     xs = np.arange(10,30,0.1)
@@ -95,7 +110,7 @@ def display_stddev_plot():
     plt.plot ([20,20],[0,y],'b')
 
     x = 20+stddev
-    ax = plt.axes()
+    ax = plt.gca()
     ax.annotate('68%', xy=(20.3, 0.045))
     ax.annotate('', xy=(20-stddev,0.04), xytext=(x,0.04),
                 arrowprops=dict(arrowstyle="<->",
@@ -112,7 +127,6 @@ def display_stddev_plot():
     ax.xaxis.set_ticklabels(['$-2\sigma$', '$-1\sigma$','$\mu$','$1\sigma$', '$2\sigma$'])
     ax.yaxis.set_ticks([])
     ax.grid(None, 'both', lw=0)
-    plt.show()
 
 if __name__ == '__main__':
     display_stddev_plot()

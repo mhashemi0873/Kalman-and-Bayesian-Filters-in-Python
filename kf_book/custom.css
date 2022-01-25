@@ -1,32 +1,36 @@
 <style>
 @import url('http://fonts.googleapis.com/css?family=Source+Code+Pro');
-@import url('http://fonts.googleapis.com/css?family=Vollkorn');
-@import url('http://fonts.googleapis.com/css?family=Arimo');
-@import url('http://fonts.googleapis.com/css?family=Fira_sans');
+@import url('http://fonts.googleapis.com/css?family=Lora');
 
 .CodeMirror pre {
     font-family: 'Source Code Pro', Consolas, monocco, monospace;
 }
     div.cell{
-        width: 900px;
+        //width: 950px;
         margin-left: 0% !important;
         margin-right: auto;
+    }
+    div.text_cell_render{
+        font-family: 'Lora';
+        line-height: 125%;
+        font-size: 100%;
+        text-align: justify;
+        text-justify:inter-word;
     }
     div.text_cell code {
         background: transparent;
         color: #000000;
-        font-weight: 600;
+        font-weight: 400;
         font-size: 11pt;
-        font-style: bold;
         font-family:  'Source Code Pro', Consolas, monocco, monospace;
    }
     h1 {
         font-family: 'Open sans',verdana,arial,sans-serif;
 	}
-	
+
     div.input_area {
         background: #F6F6F9;
-        border: 1px solid #586e75;      
+        border: 1px solid #586e75;
     }
 
     .text_cell_render h1 {
@@ -39,7 +43,7 @@
         display: block;
         white-space: wrap;
         text-align: left;
-    } 
+    }
     h2 {
         font-family: 'Open sans',verdana,arial,sans-serif;
         text-align: left;
@@ -55,7 +59,7 @@
         display: block;
         white-space: wrap;
         text-align: left;
-    } 
+    }
     h3 {
         font-family: 'Open sans',verdana,arial,sans-serif;
     }
@@ -96,23 +100,15 @@
         display: block;
         white-space: nowrap;
     }
-    div.text_cell_render{
-        font-family: 'Fira sans', verdana,arial,sans-serif;
-        line-height: 150%;
-        font-size: 110%;
-        font-weight: 400;
-        text-align:justify;
-        text-justify:inter-word;
-    }
     div.output_subarea.output_text.output_pyout {
         overflow-x: auto;
-        overflow-y: scroll;
-        max-height: 50000px;
+        overflow-y: visible;
+        max-height: 5000000px;
     }
     div.output_subarea.output_stream.output_stdout.output_text {
         overflow-x: auto;
-        overflow-y: scroll;
-        max-height: 50000px;
+        overflow-y: visible;
+        max-height: 5000000px;
     }
     div.output_wrapper{
         margin-top:0.2em;
@@ -130,42 +126,38 @@
         margin: 2em;
     }
     ul li{
-        padding-left: 0.5em; 
-        margin-bottom: 0.5em; 
-        margin-top: 0.5em; 
+        padding-left: 0.5em;
+        margin-bottom: 0.5em;
+        margin-top: 0.5em;
     }
     ul li li{
-        padding-left: 0.2em; 
-        margin-bottom: 0.2em; 
-        margin-top: 0.2em; 
+        padding-left: 0.2em;
+        margin-bottom: 0.2em;
+        margin-top: 0.2em;
     }
     ol{
         margin: 2em;
     }
     ol li{
-        padding-left: 0.5em; 
-        margin-bottom: 0.5em; 
-        margin-top: 0.5em; 
+        padding-left: 0.5em;
+        margin-bottom: 0.5em;
+        margin-top: 0.5em;
     }
     ul li{
-        padding-left: 0.5em; 
-        margin-bottom: 0.5em; 
-        margin-top: 0.2em; 
+        padding-left: 0.5em;
+        margin-bottom: 0.5em;
+        margin-top: 0.2em;
     }
     a:link{
-       font-weight: bold;
        color:#447adb;
     }
     a:visited{
-       font-weight: bold;
        color: #1d3b84;
     }
     a:hover{
-       font-weight: bold;
        color: #1d3b84;
     }
     a:focus{
-       font-weight: bold;
        color:#447adb;
     }
     a:active{
@@ -173,10 +165,10 @@
        color:#447adb;
     }
     .rendered_html :link {
-       text-decoration: underline; 
+       text-decoration: underline;
     }
     .rendered_html :hover {
-       text-decoration: none; 
+       text-decoration: none;
     }
     .rendered_html :visited {
       text-decoration: none;
@@ -189,7 +181,7 @@
     }
     .warning{
         color: rgb( 240, 20, 20 )
-    } 
+    }
     hr {
       color: #f3f3f3;
       background-color: #f3f3f3;
@@ -223,11 +215,14 @@
                 },
                 displayAlign: 'center', // Change this to 'center' to center equations.
                 "HTML-CSS": {
-                    scale:95,
+                    scale: 95,
                         availableFonts: [],
                         preferredFont:null,
                         webFont: "TeX",
                     styles: {'.MathJax_Display': {"margin": 4}}
+                },
+                 "fast-preview": {
+                    "disabled": false
                 }
         });
 </script>

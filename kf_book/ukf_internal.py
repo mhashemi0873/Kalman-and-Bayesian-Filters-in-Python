@@ -93,7 +93,7 @@ def show_four_gps():
 
 
 def show_sigma_transform(with_text=False):
-    fig = plt.figure()
+    fig = plt.gcf()
     ax=fig.gca()
 
     x = np.array([0, 5])
@@ -179,21 +179,21 @@ def show_sigma_selections():
 
     points = MerweScaledSigmaPoints(2, .09, 2., 1.)
     sigmas = points.sigma_points(x, P)
-    Wm, Wc = points.weights()
+    Wm, Wc = points.Wm, points.Wc
     plot_covariance_ellipse(x, P, facecolor='b', alpha=.3, variance=[.5])
     _plot_sigmas(sigmas, Wc, alpha=1.0, facecolor='k')
 
     x = np.array([5, 5])
     points = MerweScaledSigmaPoints(2, .15, 1., .15)
     sigmas = points.sigma_points(x, P)
-    Wm, Wc = points.weights()
+    Wm, Wc = points.Wm, points.Wc
     plot_covariance_ellipse(x, P, facecolor='b', alpha=0.3, variance=[.5])
     _plot_sigmas(sigmas, Wc, alpha=1.0, facecolor='k')
 
     x = np.array([8, 5])
     points = MerweScaledSigmaPoints(2, .2, 3., 10)
     sigmas = points.sigma_points(x, P)
-    Wm, Wc = points.weights()
+    Wm, Wc = points.Wm, points.Wc
     plot_covariance_ellipse(x, P, facecolor='b', alpha=0.3, variance=[.5])
     _plot_sigmas(sigmas, Wc, alpha=1.0, facecolor='k')
 
@@ -232,17 +232,25 @@ def show_sigmas_for_2_kappas():
     plt.show()
 
 
+def plot_sigmas(sigmas, x, cov):
+    if not np.isscalar(cov):
+        cov = np.atleast_2d(cov)
+    pts = sigmas.sigma_points(x=x, P=cov)
+    plt.scatter(pts[:, 0], pts[:, 1], s=sigmas.Wm*1000)
+    plt.axis('equal')
+
+
 def plot_sigma_points():
     x = np.array([0, 0])
     P = np.array([[4, 2], [2, 4]])
 
     sigmas = MerweScaledSigmaPoints(n=2, alpha=.3, beta=2., kappa=1.)
     S0 = sigmas.sigma_points(x, P)
-    Wm0, Wc0 = sigmas.weights()
+    Wm0, Wc0 = sigmas.Wm, sigmas.Wc
 
     sigmas = MerweScaledSigmaPoints(n=2, alpha=1., beta=2., kappa=1.)
     S1 = sigmas.sigma_points(x, P)
-    Wm1, Wc1 = sigmas.weights()
+    Wm1, Wc1 = sigmas.Wm, sigmas.Wc
 
     def plot_sigmas(s, w, **kwargs):
         min_w = min(abs(w))
@@ -258,7 +266,7 @@ def plot_sigma_points():
     plot_covariance_ellipse(x, P, facecolor='g', alpha=0.2, variance=[1, 4])
     plt.title('alpha=1')
     plt.show()
-    print(sum(Wc0))
+
 
 def plot_radar(xs, t, plot_x=True, plot_vel=True, plot_alt=True):
     xs = np.asarray(xs)
@@ -267,19 +275,22 @@ def plot_radar(xs, t, plot_x=True, plot_vel=True, plot_alt=True):
         plt.plot(t, xs[:, 0]/1000.)
         plt.xlabel('time(sec)')
         plt.ylabel('position(km)')
+        plt.tight_layout()
     if plot_vel:
         plt.figure()
         plt.plot(t, xs[:, 1])
         plt.xlabel('time(sec)')
         plt.ylabel('velocity')
+        plt.tight_layout()
     if plot_alt:
         plt.figure()
         plt.plot(t, xs[:,2])
         plt.xlabel('time(sec)')
         plt.ylabel('altitude')
+        plt.tight_layout()
     plt.show()
 
-    
+
 def plot_altitude(xs, t, track):
     xs = np.asarray(xs)
 
@@ -289,11 +300,11 @@ def plot_altitude(xs, t, track):
     plt.ylabel('altitude')
     plt.legend(loc=4)
 
-    
+
 def print_sigmas(n=1, mean=5, cov=3, alpha=.1, beta=2., kappa=2):
     points = MerweScaledSigmaPoints(n, alpha, beta, kappa)
     print('sigmas: ', points.sigma_points(mean,  cov).T[0])
-    Wm, Wc = points.weights()
+    Wm, Wc = points.Wm, points.Wc
     print('mean weights:', Wm)
     print('cov weights:', Wc)
     print('lambda:', alpha**2 *(n+kappa) - n)
@@ -330,16 +341,26 @@ def plot_rts_output(xs, Ms, t):
 
 
 def plot_scatter_of_bearing_error():
-    d = 100
-    xs, ys = [], []
+    def plot_scatter(theta):
+        theta = math.radians(theta)
+        d = 100
+        xs, ys = [], []
+        for i in range (3000):
+            a = theta + randn() * math.radians(1)
+            xs.append(d*math.cos(a))
+            ys.append(d*math.sin(a))
+        plt.scatter(xs, ys)
+        plt.xlabel('x')
+        plt.ylabel('y')
 
-    for i in range (3000):
-        a = math.radians(30) + randn() * math.radians(1)
-        xs.append(d*math.cos(a))
-        ys.append(d*math.sin(a))
-    plt.scatter(xs, ys)
-    plt.xlabel('x')
-    plt.ylabel('y')
+    plt.subplot(121)
+    plot_scatter(45)
+    plt.gca().set_aspect('equal')
+    plt.title("45° bearing")
+    plt.subplot(122)
+    plot_scatter(180)
+    plt.xlim((-101, -99))
+    plt.title("180° bearing")
 
 
 def plot_scatter_moving_target():
@@ -354,7 +375,7 @@ def plot_scatter_moving_target():
             a = actual_angle + randn() * math.radians(1)
             xs.append(d*math.cos(a))
             ys.append(d*math.sin(a))
-        plt.scatter(xs, ys)
+        plt.scatter(xs, ys, c='C0')
 
     plt.axis('equal')
     plt.plot([5.5, pos[0]], [6, pos[1]], c='g', linestyle='--')
@@ -362,20 +383,38 @@ def plot_scatter_moving_target():
 
 def _isct(pa, pb, alpha, beta):
     """ Returns the (x, y) intersections of points pa and pb
-    given the bearing ba for point pa and bearing bb for
+    given the bearing alpha for point pa and bearing beta for
     point pb.
     """
 
-    B = [pb[0] - pa[0], pb[1] - pa[1]]
-    AB = math.sqrt((pa[0] - pb[0])**2 + (pa[1] - pb[1])**2)
-    ab = atan2(B[1], B[0])
-    a = alpha - ab
-    b = pi - beta - ab
-    p = pi - b - a
+    ax, ay = pa
+    cx, cy = pb
 
-    AP = (sin(b) / sin(p)) * AB
-    x = cos(alpha) * AP + pa[0]
-    y = sin(alpha) * AP + pa[1]
+    # bearing to angle
+    alpha = 90 - alpha
+    beta = 90 - beta
+
+    # compute second point, let hypot==1
+    bx = cos(alpha) + ax
+    by = sin(alpha) + ay
+    dx = cos(beta) + cx
+    dy = sin(beta) + cy
+
+    # Line AB represented as a1x + b1y = c1
+    # Line CD represented as a2x + b2y = c2
+
+    a1 = by - ay
+    b1 = ax - bx
+    c1 = a1*ax + b1*ay
+
+    a2 = dy - cy
+    b2 = cx - dx
+    c2 = a2*cx + b2*cy
+    det = a1*b2 - a2*b1
+
+    x = (b2*c1 - b1*c2) / det
+    y = (a1*c2 - a2*c1) / det
+
     return x, y
 
 
@@ -394,7 +433,7 @@ def _plot_iscts(pos, sa, sb, N=4):
             a_a = actual_angle_a + randn() * math.radians(1)
             a_b = actual_angle_b + randn() * math.radians(1)
 
-            x,y = _isct(sa, sb, a_a, a_b)
+            x, y = _isct(sa, sb, a_a, a_b)
             xs.append(x)
             ys.append(y)
 
@@ -404,20 +443,24 @@ def _plot_iscts(pos, sa, sb, N=4):
             xs_b.append(db*math.cos(a_b) + sb[0])
             ys_b.append(db*math.sin(a_b) + sb[1])
 
-        plt.scatter(xs, ys, c='r', marker='.')
-        plt.scatter(xs_a, ys_a)
-        plt.scatter(xs_b, ys_b)
+        plt.scatter(xs, ys, c='r', marker='.', alpha=0.5)
+        plt.scatter(xs_a, ys_a, c='k', edgecolor='k')
+        plt.scatter(xs_b, ys_b, marker='v', edgecolor=None, c='C0')
     plt.gca().set_aspect('equal')
 
 
 def plot_iscts_two_sensors():
+    plt.subplot(121)
     pos = np.array([4., 4,])
     sa = [0., 2.]
     sb = [8., 2.]
 
-    plt.scatter(*sa, s=100)
-    plt.scatter(*sb, s=100)
+    plt.scatter(*sa, s=200, c='k', marker='v')
+    plt.scatter(*sb, s=200, marker='s', c='C0')
     _plot_iscts(pos, sa, sb, N=4)
+    plt.subplot(122)
+    plot_iscts_two_sensors_changed_sensors()
+
 
 
 def plot_iscts_two_sensors_changed_sensors():
@@ -425,8 +468,8 @@ def plot_iscts_two_sensors_changed_sensors():
     sb = [3, 7]
     pos= np.array([3., 3.])
 
-    plt.scatter(*sa, s=100)
-    plt.scatter(*sb, s=100)
+    plt.scatter(*sa, s=200, c='k', marker='v')
+    plt.scatter(*sb, s=200, marker='s')
     _plot_iscts(pos, sa, sb, N=5)
     plt.ylim(3.8, 8.5)
 
@@ -435,8 +478,9 @@ if __name__ == '__main__':
 
     #show_2d_transform()
     #show_sigma_selections()
+    plot_scatter_of_bearing_error()
 
-    show_sigma_transform(True)
+    #show_sigma_transform(True)
     #show_four_gps()
     #show_sigma_transform()
     #show_sigma_selections()
